@@ -16,53 +16,56 @@ from sklearn.ensemble import RandomForestRegressor
 import shutil
 from datetime import datetime
 
-def make_pipeline(regressor):
-    pipe = Pipeline(
-    [('Column_selection', Column_selection()),
-    ('Drop_na', Drop_na()),
-    ('Scaling', Scaling()),
-    ('Radians', Radians()),
-    ('VectorizeDir', VectorizeDir()),
-    ('PolynomialFeatures', PolynomialFeatures(degree=2)),
-    ('Regressor', regressor)]
-    )
-
-    return pipe
-
-def save_best_model(pipeline):
-    mlflow.sklearn.save_model(
-        pipeline,
-        path="best_model",
-        conda_env="conda.yaml")
-    
-def save_model(pipeline):
-    mlflow.sklearn.save_model(
-        pipeline,
-        path="best_model",
-        conda_env="conda.yaml")
-
-
-def read_best_model():
-    with open("best_model.json", "r") as f:
-        best_model = json.loads(f.read())
-        return best_model
-    
-def create_new_model_dict(model_name, final_score):
-    model_dict = {
-        "timestamp": datetime.now().timestamp(),
-        "date": datetime.today().strftime("%m/%d/%Y"),
-        "model_name": model_name,
-        "score": final_score,
-    }
-
-    return model_dict
-
-def save_model_metadata_to_disk(best_model):
-    with open("best_model.json", "w") as f:
-        json.dump(best_model, f)
-
 
 def main():
+    
+    def make_pipeline(regressor):
+        pipe = Pipeline(
+        [('Column_selection', Column_selection()),
+        ('Drop_na', Drop_na()),
+        ('Scaling', Scaling()),
+        ('Radians', Radians()),
+        ('VectorizeDir', VectorizeDir()),
+        ('PolynomialFeatures', PolynomialFeatures(degree=2)),
+        ('Regressor', regressor)]
+        )
+
+        return pipe
+
+    def save_best_model(pipeline):
+        mlflow.sklearn.save_model(
+            pipeline,
+            path="best_model",
+            conda_env="conda.yaml")
+
+    def save_model(pipeline):
+        mlflow.sklearn.save_model(
+            pipeline,
+            path="best_model",
+            conda_env="conda.yaml")
+
+
+    def read_best_model():
+        with open("best_model.json", "r") as f:
+            best_model = json.loads(f.read())
+            return best_model
+
+    def create_new_model_dict(model_name, final_score):
+        model_dict = {
+            "timestamp": datetime.now().timestamp(),
+            "date": datetime.today().strftime("%m/%d/%Y"),
+            "model_name": model_name,
+            "score": final_score,
+        }
+
+        return model_dict
+
+    def save_model_metadata_to_disk(best_model):
+        with open("best_model.json", "w") as f:
+            json.dump(best_model, f)
+
+            
+
     df = pd.read_json("dataset.json", orient="split")
     X = df
     y = df['Total']
