@@ -87,6 +87,7 @@ def main():
             mlflow.sklearn.log_model(pipeline, artifact_path=f"{name}")
 
             pipe_score = pipeline.score(X_test, y_test)
+            print(pipe_score)
 
             mlflow.log_metric('R2 score', pipe_score)
 
