@@ -64,9 +64,7 @@ def main():
         with open("best_model.json", "w") as f:
             json.dump(best_model, f)
 
-            
-    
-    mlflow.set_experiment('<mgei> - <MLFlow tracking wind power>')
+          
     df = pd.read_json("dataset.json", orient="split")
     df = df.dropna(axis=0, how='any')
     X = df.drop(columns=['Total'])
