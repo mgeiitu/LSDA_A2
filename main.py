@@ -71,43 +71,41 @@ def main():
     y = df['Total']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False, random_state=42)
 
-    with mlflow.start_run(run_name="<descriptive name>"):
+    regression_models = {'LinearRegression': LinearRegression(),
+                        'KNeighborsRegressor': KNeighborsRegressor(),
+                        'GradientBoostingRegressor': GradientBoostingRegressor(),
+                        'RandomForestRegressor': RandomForestRegressor()}
 
-        regression_models = {'LinearRegression': LinearRegression(),
-                            'KNeighborsRegressor': KNeighborsRegressor(),
-                            'GradientBoostingRegressor': GradientBoostingRegressor(),
-                            'RandomForestRegressor': RandomForestRegressor()}
+    for name, model in regression_models.items():
 
-        for name, model in regression_models.items():
+        with mlflow.start_run(run_name=f"{name}"):
 
-            with mlflow.start_run(run_name=f"{name}"):
+            pipeline = make_pipeline(model)
 
-                pipeline = make_pipeline(model)
+            pipeline.fit(X_train, y_train)
+            mlflow.sklearn.log_model(pipeline, artifact_path=f"{name}")
 
-                pipeline.fit(X_train, y_train)
-                mlflow.sklearn.log_model(pipeline, artifact_path=f"{name}")
+            pipe_score = pipeline.score(X_test, y_test)
 
-                pipe_score = pipeline.score(X_test, y_test)
+            mlflow.log_metric('R2 score', pipe_score)
 
-                mlflow.log_metric('R2 score', pipe_score)
-
-                try:
-                    best_model = read_best_model()
-                    if pipe_score > best_model["score"]:
-                        shutil.rmtree('best_model')  # deleting current best_model directory
-                        print(f'Saving new best model {model}')
-                        save_model(pipeline)
-                        best_model = create_new_model_dict(name, pipe_score)
-                        save_model_metadata_to_disk(best_model)
-
-                    else:
-                        print(f"Model {model} not better. Not saving")
-
-                except FileNotFoundError:
-                    print(f"No model saved to disk yet. Saving {model}")
+            try:
+                best_model = read_best_model()
+                if pipe_score > best_model["score"]:
+                    shutil.rmtree('best_model')  # deleting current best_model directory
+                    print(f'Saving new best model {model}')
                     save_model(pipeline)
                     best_model = create_new_model_dict(name, pipe_score)
                     save_model_metadata_to_disk(best_model)
+
+                else:
+                    print(f"Model {model} not better. Not saving")
+
+            except FileNotFoundError:
+                print(f"No model saved to disk yet. Saving {model}")
+                save_model(pipeline)
+                best_model = create_new_model_dict(name, pipe_score)
+                save_model_metadata_to_disk(best_model)
 
 if __name__ == '__main__':
     main()
