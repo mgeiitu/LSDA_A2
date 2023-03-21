@@ -65,10 +65,13 @@ def main():
             json.dump(best_model, f)
 
             
-
+    
+    ml.set_experiment('<mgei> - <MLFlow tracking wind power>')
     df = pd.read_json("dataset.json", orient="split")
-    X = df
+    df = df.dropna(axis=0, how='any')
+    X = df.drop(columns=['Total'])
     y = df['Total']
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False, random_state=42)
 
     regression_models = {'LinearRegression': LinearRegression(),
