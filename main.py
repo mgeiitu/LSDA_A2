@@ -32,12 +32,6 @@ def main():
 
         return pipe
 
-    def save_best_model(pipeline):
-        mlflow.sklearn.save_model(
-            pipeline,
-            path="best_model",
-            conda_env="conda.yaml")
-
     def save_model(pipeline):
         mlflow.sklearn.save_model(
             pipeline,
