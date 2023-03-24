@@ -94,7 +94,7 @@ def main():
             try:
                 best_model = read_best_model()
                 if pipe_score > best_model["score"]:
-                    shutil.rmtree('best_model')  # deleting current best_model directory
+                    shutil.rmtree('best_model')
                     print(f'Saving new best model {model}')
                     save_model(pipeline)
                     best_model = create_new_model_dict(name, pipe_score)
