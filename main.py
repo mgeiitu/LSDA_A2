@@ -1,7 +1,6 @@
 import pandas as pd
 import mlflow
 import json
-from influxdb import InfluxDBClient
 
 from sklearn.pipeline import Pipeline
 from transformers import (Column_selection, Scaling, Drop_na, Radians, VectorizeDir)
